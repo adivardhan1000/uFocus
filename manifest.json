@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "uFocus",
-    "version": "1.1",
+    "version": "1.2",
     "description": "Tracks the time spent on websites (only when the tab is focused and the browser is active).",
     "permissions": [
       "tabs",
