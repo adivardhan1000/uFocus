@@ -20,7 +20,7 @@ jobs:
         with:
           cmd: build
           source: .
-          filename: "ufocus-{version}.xpi"
+          filename: "ufocus.zip"
 
       - name: Upload XPI Artifact
         uses: actions/upload-artifact@v4
@@ -60,4 +60,4 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release upload ${{ github.ref_name }} \
-          ${{ steps.web-ext-sign.outputs.target }}
+            ${{ steps.web-ext-sign.outputs.target }}
