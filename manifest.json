@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "uFocus",
-    "version": "1.0",
+    "version": "1.1",
     "description": "Tracks the time spent on websites (only when the tab is focused and the browser is active).",
     "permissions": [
       "tabs",
@@ -13,7 +13,12 @@
     },
     "browser_action": {
       "default_popup": "popup.html",
-      "default_title": "Time Tracker"
+      "default_title": "uFocus - Time Tracker"
+    },
+    "applications": {
+    "gecko": {
+      "id": "{aa423535-b06f-42c3-9419-55ac62edb377}"
     }
+  }
   }
   
