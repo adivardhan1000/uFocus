@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Website Time Tracker</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 10px; }
+      table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+      th, td { border: 1px solid #ccc; padding: 4px 8px; text-align: left; }
+      #customRange { display: none; margin-top: 10px; }
+      button { margin-top: 10px; margin-right: 5px; }
+    </style>
+  </head>
+  <body>
+    <h2>Time Tracker</h2>
+    <label for="filter">Filter:</label>
+    <select id="filter">
+      <option value="today">Today</option>
+      <option value="past24">Past 24 Hours</option>
+      <option value="all">All Time</option>
+      <option value="custom">Custom Range</option>
+    </select>
+
+    <div id="customRange">
+      <label>From: <input type="datetime-local" id="fromTime"></label>
+      <br>
+      <label>To: <input type="datetime-local" id="toTime"></label>
+    </div>
+
+    <button id="applyFilter">Apply Filter</button>
+    <button id="exportCsv">Export CSV</button>
+    <button id="clearData">Clear Data</button>
+
+    <table id="dataTable">
+      <thead>
+        <tr>
+          <th>Domain</th>
+          <th>Time Spent (seconds)</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
