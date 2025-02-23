@@ -48,7 +48,7 @@ jobs:
         uses: kewisch/action-web-ext@v1.3
         with:
           cmd: sign
-          source: ${{ steps.web-ext-build.outputs.target }}  # Correct input
+          source: build/ufocus.zip
           channel: listed  # Use "unlisted" if this is the first submission
           apiKey: ${{ secrets.AMO_API_KEY }}
           apiSecret: ${{ secrets.AMO_API_SECRET }}
