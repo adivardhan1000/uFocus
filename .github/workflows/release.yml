@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Create ZIP Package
         run: |
@@ -20,7 +20,7 @@ jobs:
           zip -r build/ufocus.zip manifest.json background.js popup.html popup.js
 
       - name: Upload ZIP as an Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ufocus
           path: build/ufocus.zip
@@ -31,10 +31,10 @@ jobs:
     needs: build
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Download the ZIP from Build
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ufocus
           path: build/
