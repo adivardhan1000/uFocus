@@ -1,0 +1,32 @@
+name: Build and Attach Zip on PR
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  build:
+    name: Build and Package Extension
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Build Extension
+        id: web-ext-build
+        uses: kewisch/action-web-ext@v1.3
+        with:
+          cmd: build
+          source: .
+          filename: "ufocus.zip"
+
+      - name: Upload XPI Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ufocus-extension
+          path: ${{ steps.web-ext-build.outputs.target }}
+
+      - name: Attach Zip to PR
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} --body "Here is the latest build: [ufocus.zip](${{ steps.web-ext-build.outputs.target }})"
