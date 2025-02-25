@@ -1,4 +1,4 @@
-name: Build and Attach Zip on PR
+name: Comment on PR with Build Artifact
 
 on:
   pull_request:
@@ -28,5 +28,7 @@ jobs:
           path: ${{ steps.web-ext-build.outputs.target }}
 
       - name: Attach Zip to PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh pr comment ${{ github.event.pull_request.number }} --body "Here is the latest build: [ufocus.zip](${{ steps.web-ext-build.outputs.target }})"
