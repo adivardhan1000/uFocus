@@ -1,0 +1,41 @@
+name: Comment on PR with Build Artifact
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  build:
+    name: Build and Package Extension
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Build Extension
+        id: web-ext-build
+        uses: kewisch/action-web-ext@v1.3
+        with:
+          cmd: build
+          source: .
+          filename: "ufocus.zip"
+
+      - name: Zip the files
+        run: |
+          mkdir -p build
+          unzip ${{ steps.web-ext-build.outputs.target }} -d build
+          cd build
+          zip -r ../ufocus-files.zip .
+
+      - name: Upload Zipped Files Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ufocus-files
+          path: ufocus-files.zip
+
+      - name: Attach Zip to PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} --body "Here is the latest build: [ufocus-files.zip](../ufocus-files.zip)"
