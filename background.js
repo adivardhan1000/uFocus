@@ -4,6 +4,7 @@
 let activeTabId = null;
 let activeStartTime = null;
 let activeDomain = null;
+let activeContainer = null;
 
 // Helper: Extract main domain (treat subdomains as main domain)
 function getBaseDomain(url) {
@@ -31,16 +32,15 @@ function addRecord(record) {
   });
 }
 
-// Stop the current tracking session and record time
 function stopTracking() {
   if (activeTabId && activeStartTime && activeDomain) {
     const now = Date.now();
-    // Only record if at least one second has passed
     if (now - activeStartTime > 1000) {
       const record = {
         domain: activeDomain,
         start: activeStartTime,
-        end: now
+        end: now,
+        container: activeContainer
       };
       addRecord(record);
     }
@@ -48,37 +48,35 @@ function stopTracking() {
   activeTabId = null;
   activeDomain = null;
   activeStartTime = null;
+  activeContainer = null;
 }
 
-// Start tracking for a given tab
-function startTracking(tabId, url) {
-  // Only track http(s) URLs
+function startTracking(tabId, url, container) {
   if (!url || !(url.startsWith("http://") || url.startsWith("https://"))) return;
   activeTabId = tabId;
   activeDomain = getBaseDomain(url);
   activeStartTime = Date.now();
+  activeContainer = container;
 }
 
-// When the active tab changes
 function handleTabActivated(activeInfo) {
   stopTracking();
   browser.tabs.get(activeInfo.tabId).then(tab => {
-    startTracking(tab.id, tab.url);
+    const container = getContainerTabInfo(tab);
+    startTracking(tab.id, tab.url, container);
   });
 }
 
-// When window focus changes (if no window is focused, stop tracking)
 function handleWindowFocusChanged(windowId) {
-  // WINDOW_ID_NONE means no window is focused
   if (windowId === browser.windows.WINDOW_ID_NONE) {
     stopTracking();
   } else {
-    // Get the active tab in the focused window
     browser.tabs.query({ active: true, windowId: windowId }).then(tabs => {
       if (tabs.length > 0) {
         const tab = tabs[0];
+        const container = getContainerTabInfo(tab);
         stopTracking();
-        startTracking(tab.id, tab.url);
+        startTracking(tab.id, tab.url, container);
       }
     });
   }
@@ -87,28 +85,30 @@ function handleWindowFocusChanged(windowId) {
 // If the URL of the active tab changes, update the tracking session
 function handleTabUpdated(tabId, changeInfo, tab) {
   if (tabId === activeTabId && changeInfo.url) {
+    const container = getContainerTabInfo(tab);
     stopTracking();
-    startTracking(tab.id, tab.url);
+    startTracking(tab.id, tab.url, container);
   }
 }
 
-// Listen for events
+function getContainerTabInfo(tab) {
+  return tab.cookieStoreId || null;
+}
+
 browser.tabs.onActivated.addListener(handleTabActivated);
 browser.windows.onFocusChanged.addListener(handleWindowFocusChanged);
 browser.tabs.onUpdated.addListener(handleTabUpdated, { properties: ["url"] });
 
-// Also, listen for idle state changes if needed
-// (You can optionally use browser.idle.onStateChanged to stop tracking if the user is idle)
 browser.idle.onStateChanged.addListener(state => {
   if (state !== "active") {
     stopTracking();
   } else {
-    // When returning from idle, get the current active tab of the current window
     browser.windows.getLastFocused({ populate: true }).then(win => {
       if (win && win.focused) {
         const activeTab = win.tabs.find(t => t.active);
         if (activeTab) {
-          startTracking(activeTab.id, activeTab.url);
+          const container = getContainerTabInfo(activeTab);
+          startTracking(activeTab.id, activeTab.url, container);
         }
       }
     });
